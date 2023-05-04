@@ -22,27 +22,35 @@ public class ServerListenerThread extends Thread{
 
     @Override
     public void run() {
+        connect();
+    }
 
+    private void connect() {
         try {
-
-            while ( serverSocket.isBound() && !serverSocket.isClosed()) {
-                Socket socket = serverSocket.accept();
-
-                LOGGER.info(" * Connection accepted: " + socket.getInetAddress());
-
-                HttpConnectionWorkerThread workerThread = new HttpConnectionWorkerThread(socket);
-                workerThread.start();
-            }
-
+            startThread();
         } catch (IOException e) {
             LOGGER.error("Problem with setting socket", e);
         } finally {
-            if (serverSocket!=null) {
-                try {
-                    serverSocket.close();
-                } catch (IOException e) {}
-            }
+            closeConnection();
         }
+    }
 
+    private void startThread() throws IOException {
+        while ( serverSocket.isBound() && !serverSocket.isClosed()) {
+            Socket socket = serverSocket.accept();
+
+            LOGGER.info(" * Connection accepted: " + socket.getInetAddress());
+
+            HttpConnectionWorkerThread workerThread = new HttpConnectionWorkerThread(socket);
+            workerThread.start();
+        }
+    }
+
+    private void closeConnection() {
+        if (serverSocket!=null) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {}
+        }
     }
 }

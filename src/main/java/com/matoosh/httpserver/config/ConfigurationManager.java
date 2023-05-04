@@ -25,12 +25,25 @@ public class ConfigurationManager {
 
     public void loadConfigurationFile(String filePath) {
         FileReader fileReader;
+        fileReader = getFileReader(filePath);
+        StringBuilder sb = new StringBuilder();
+        appendConfigurationChar(fileReader, sb);
+        JsonNode conf;
+        conf = getJsonNode(sb);
+        getCurrentConfiguration(conf);
+    }
+
+    private FileReader getFileReader(String filePath) {
+        FileReader fileReader;
         try {
             fileReader = new FileReader(filePath);
         } catch (FileNotFoundException e) {
             throw new HttpsConfigurationException(e);
         }
-        StringBuilder sb = new StringBuilder();
+        return fileReader;
+    }
+
+    private void appendConfigurationChar(FileReader fileReader, StringBuilder sb) {
         int i;
         while (true) {
             try {
@@ -40,12 +53,19 @@ public class ConfigurationManager {
             }
             sb.append((char)i);
         }
+    }
+
+    private JsonNode getJsonNode(StringBuilder sb) {
         JsonNode conf;
         try {
             conf = Json.parse(sb.toString());
         } catch (IOException e) {
             throw new HttpsConfigurationException("Error Parsing The Configuration File.", e);
         }
+        return conf;
+    }
+
+    private void getCurrentConfiguration(JsonNode conf) {
         try {
             myCurrentConfiguration = Json.fromJson(conf, Configuration.class);
         } catch (JsonProcessingException e) {

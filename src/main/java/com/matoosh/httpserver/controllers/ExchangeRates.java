@@ -23,21 +23,31 @@ public class ExchangeRates {
 
         int responseCode = connection.getResponseCode();
 
+        return loadResponse(connection, responseCode);
+    }
+
+    private String loadResponse(HttpURLConnection connection, int responseCode) throws IOException {
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String inputLine;
-                StringBuilder content = new StringBuilder();
-
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
-
-                return content.toString();
-            } finally {
-                connection.disconnect();
-            }
+            return loadResponse(connection);
         } else {
             throw new IOException("Error: " + responseCode);
+        }
+    }
+
+    private String loadResponse(HttpURLConnection connection) throws IOException {
+        try (BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            StringBuilder content = new StringBuilder();
+            createResponse(input, content);
+            return content.toString();
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    private void createResponse(BufferedReader input, StringBuilder content) throws IOException {
+        String inputLine;
+        while ((inputLine = input.readLine()) != null) {
+            content.append(inputLine);
         }
     }
 
