@@ -23,7 +23,6 @@ public class ConfigurationManager {
         return myConfigurationManager;
     }
 
-    //Loading Configuration file by the path provided
     public void loadConfigurationFile(String filePath) {
         FileReader fileReader;
         try {
@@ -54,8 +53,6 @@ public class ConfigurationManager {
         }
     }
 
-
-    //Returns the current loaded configuration
     public Configuration getCurrentConfiguration() {
 
         if(myCurrentConfiguration == null) {
